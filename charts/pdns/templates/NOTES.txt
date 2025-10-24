@@ -1,0 +1,18 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To get the Nexus URL:
+{{- if contains "LoadBalancer" .Values.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        Watch the status with: 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ .Release.Name }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ .Release.Name }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP:{{ .Values.webserver.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl port-forward $POD_NAME {{ .Values.service.webserver.port }}:{{ .Values.service.webserver.port }}
+  echo "Visit http://127.0.0.1:{{ .Values.service.webserver.port }}"
+{{- end }}
+
+Initial admin password: {{ .Values.pdns.apiPassword }}
+

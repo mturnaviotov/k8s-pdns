@@ -1,0 +1,6 @@
+apiVersion: v2
+name: pdns
+description: A Helm chart for PowerDNS Authoritative Server
+# Chart version
+version: 0.0.1
+AppVersion: "latest"

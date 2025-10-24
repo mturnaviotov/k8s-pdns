@@ -1,0 +1,75 @@
+image:
+  repository: pdns
+  # tag is taken from Chart.appVersion if not specified
+  pullPolicy: IfNotPresent
+
+service:
+  type: "ClusterIP"
+  annotations:
+  webserver:
+    enabled: true
+    port: 8081
+    protocol: TCP
+  dnstcp:
+    enabled: true
+    port: 53
+    protocol: TCP
+  dnsudp:
+    enabled: true
+    port: 53
+    protocol: UDP
+
+ingress:
+  enabled: true
+  host: pdns.local
+  port: 8081
+  annotations:
+    kubernetes.io/ingress.className: nginx
+
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "pdns.local"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: "pdns.local"
+            port:
+              number: 8081
+
+## All pdns specific values should be under '_pdns=' key at the end
+## for proper templating for pdns params comand line args
+## You can use any official supported configuration options from documentation
+## Docker image prepared for SQlite storage, if you need other - tune Dockerfile
+apiPassword: &pdns_pass "123123123"
+pdns:
+  apiPassword: *pdns_pass # Replace with your admin password from env vars or secret manager
+  env:
+  - name: api_pdns
+    value: "yes"
+  - name: api-key_pdns
+    value: *pdns_pass
+  - name: domain-metadata-cache-ttl_pdns
+    value: "60"
+  - name: gsqlite3-database_pdns
+    value: "/var/lib/powerdns/pdns.sqlite3"
+  - name: launch_pdns
+    value: "gsqlite3"
+  - name: webserver_pdns
+    value: "yes"
+  - name: webserver-address_pdns
+    value: "0.0.0.0"
+  - name: webserver-allow-from_pdns
+    value: "192.168.0.0/16,127.0.0.1,::1"
+  - name: webserver-password_pdns
+    value: *pdns_pass
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "2Gi"
+    limits:
+      cpu: "2000m"
+      memory: "4Gi"

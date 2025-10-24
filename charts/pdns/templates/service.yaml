@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    {{- if .Values.service.webserver.enabled }}
+    - port: {{ .Values.service.webserver.port }}
+      targetPort: {{ .Values.service.webserver.port }}
+      protocol: {{ .Values.service.webserver.protocol }}
+      name: webserver
+    {{- end }}
+    {{- if .Values.service.dnstcp.enabled }}
+    - port: {{ .Values.service.dnstcp.port }}
+      targetPort: {{ .Values.service.dnstcp.port }}
+      protocol: {{ .Values.service.dnstcp.protocol }}
+      name: dns-tcp
+    {{- end }}
+    {{- if .Values.service.dnsudp.enabled }}
+    - port: {{ .Values.service.dnsudp.port }}
+      targetPort: {{ .Values.service.dnsudp.port }}
+      protocol: {{ .Values.service.dnsudp.protocol }}
+      name: dns-udp
+    {{- end }}
+  selector:
+    app: {{ .Release.Name }}
