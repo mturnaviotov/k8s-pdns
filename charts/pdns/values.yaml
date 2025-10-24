@@ -52,7 +52,7 @@ pdns:
     value: "yes"
   - name: api-key_pdns
     value: *pdns_pass
-  - name: domain-metadata-cache-ttl_pdns
+  - name: zone-metadata-cache-ttl
     value: "60"
   - name: gsqlite3-database_pdns
     value: "/var/lib/powerdns/pdns.sqlite3"
