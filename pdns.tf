@@ -32,7 +32,7 @@ resource "helm_release" "pdns" {
   namespace        = kubernetes_namespace.dns.metadata[0].name
   create_namespace = false
   values = [<<EOF
-apiPassword: &pdns_pass ${var.dns_server_password}
+apiPassword: &pdns_pass "${var.dns_server_password}"
 pdns:
   apiPassword: *pdns_pass # Replace with your admin password from env vars or secret manager
   env:
