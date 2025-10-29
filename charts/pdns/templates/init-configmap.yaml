@@ -21,10 +21,12 @@ data:
       echo "Waiting for pdns to be ready..."
       sleep 1
     done
-    echo Unauthorized - is ok -> all
+    # echo Unauthorized - is ok -> all
     echo =-=-=-=-=-=-=-= Tuning requests here =-=-=-=-=-=-=-=
-    curl -s -X POST -H 'X-API-KEY: {{ .Values.pdns.apiPassword }}' \
+    {{- range .Values.pdns.zones }}
+    curl -s -X POST -H 'X-API-KEY: {{ $.Values.pdns.apiPassword }}' \
       -H 'accept: application/json' -H 'Content-Type: application/json' \
-      -d '{"name": "test.tld.", "kind": "Native", "masters": [], "nameservers": ["ns1.test.tld.", "ns2.test.tld."]}' \
-      "http://{{ include "app.FQDN" . }}/api/v1/servers/localhost/zones"
+      -d '{"name": "{{ . }}.", "kind": "Native", "masters": [], "nameservers": ["ns1.test.tld.", "ns2.test.tld."]}' \
+      "http://{{ include "app.FQDN" $ }}/api/v1/servers/localhost/zones"
+    {{- end }}
     echo "Initialization script completed."

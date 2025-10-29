@@ -21,22 +21,29 @@ service:
 
 ingress:
   enabled: true
-  host: pdns.local
+  host: pdns.zone.internal
+  ClusterIP: 192.168.194.130
   port: 8081
   annotations:
-    kubernetes.io/ingress.className: nginx
+    kubernetes.io/ingress.className: traefik
+    cert-manager.io/cluster-issuer: local-ca
+    external-dns.alpha.kubernetes.io/hostname: pdns.zone.internal
+    traefik.ingress.kubernetes.io/router.entrypoints: "web"
+    #traefik.ingress.kubernetes.io/router.middlewares: "default-https-redirect@kubernetescrd"
+    #traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.priority: "10"
 
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
-  - host: "pdns.local"
+  - host: "pdns.zone.internal"
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: "pdns.local"
+            name: "pdns.zone.internal"
             port:
               number: 8081
 
@@ -47,6 +54,8 @@ spec:
 apiPassword: &pdns_pass "123123123"
 pdns:
   apiPassword: *pdns_pass # Replace with your admin password from env vars or secret manager
+  zones:
+  - zone.internal
   env:
   - name: api_pdns
     value: "yes"
@@ -68,8 +77,8 @@ pdns:
     value: *pdns_pass
   resources:
     requests:
-      cpu: "500m"
-      memory: "2Gi"
+      cpu: "100m"
+      memory: "512M"
     limits:
-      cpu: "2000m"
-      memory: "4Gi"
+      cpu: "200m"
+      memory: "1Gi"

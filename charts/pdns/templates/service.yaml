@@ -10,6 +10,9 @@ metadata:
   annotations:
 spec:
   type: {{ .Values.service.type }}
+  {{- if .Values.ingress.ClusterIP }}
+  clusterIP: {{ .Values.ingress.ClusterIP | quote }}
+  {{- end }}
   ports:
     {{- if .Values.service.webserver.enabled }}
     - port: {{ .Values.service.webserver.port }}
