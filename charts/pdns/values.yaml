@@ -1,5 +1,5 @@
 image:
-  repository: pdns
+  repository: foxmuldercp/pdns
   # tag is taken from Chart.appVersion if not specified
   pullPolicy: IfNotPresent
 
