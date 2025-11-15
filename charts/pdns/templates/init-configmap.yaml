@@ -21,12 +21,14 @@ data:
       echo "Waiting for pdns to be ready..."
       sleep 1
     done
-    # echo Unauthorized - is ok -> all
-    echo =-=-=-=-=-=-=-= Tuning requests here =-=-=-=-=-=-=-=
     {{- range .Values.pdns.zones }}
-    curl -s -X POST -H 'X-API-KEY: {{ $.Values.pdns.apiPassword }}' \
+    curl -v -X POST -H 'X-API-KEY: {{ $.Values.pdns.apiPassword }}' \
       -H 'accept: application/json' -H 'Content-Type: application/json' \
-      -d '{"name": "{{ . }}.", "kind": "Native", "masters": [], "nameservers": ["ns1.test.tld.", "ns2.test.tld."]}' \
+      -d '{"name": "{{ . }}.", "kind": "Native", "masters": [], "nameservers": ["ns1.{{ . }}.", "ns2.{{ . }}."]}' \
       "http://{{ include "app.FQDN" $ }}/api/v1/servers/localhost/zones"
+    curl -v -X PATCH -H 'X-API-KEY: {{ $.Values.pdns.apiPassword }}' \
+      -H 'accept: application/json' -H 'Content-Type: application/json' \
+      -d '{"rrsets":[{"changetype":"REPLACE","name":"{{ . }}.","records":[{"content":"ns1.{{ . }}. hostmaster.{{ . }}. 0 300 300 300 300","disabled":false}],"ttl":300,"type":"SOA"}]}' \
+      "http://{{ include "app.FQDN" $ }}/api/v1/servers/localhost/zones/{{ .}}"
     {{- end }}
     echo "Initialization script completed."
