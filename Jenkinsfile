@@ -39,11 +39,8 @@ spec:
                 checkout scmGit(branches: [[name: '*']],
                     extensions: [], userRemoteConfigs:
                     [[url: 'https://github.com/mturnaviotov/k8s-pdns.git']])
-                sh 'apk add --no-cache docker helm github-cli'
+                sh 'apk add --no-cache helm github-cli'
                 sh 'git config --global --add safe.directory "*"'
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'regpass', usernameVariable: 'reguser')]) {
-                    sh 'docker login -u $reguser -p $regpass'
-                }
             }
         }
         stage('Run Builds') {
@@ -55,14 +52,13 @@ spec:
                                 version=`git tag --points-at HEAD`
                                 echo $version
                                 helm package ./charts/pdns
-                                docker buildx build --push -t foxmuldercp/pdns:${version} .
                                 gh release create $version ./pdns-$version.tgz -R mturnaviotov/k8s-pdns --title $version --generate-notes
                             '''
                         }
                     }
                     post {
                         always {
-                            sh 'echo PowerDNS build finished. tests can be pushed here'
+                            sh 'echo PowerDNS Helm package build finished. tests can be pushed here'
                         }
                     }
                 }

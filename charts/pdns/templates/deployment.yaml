@@ -7,8 +7,6 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-  annotations:
-    deployment.kubernetes.io/revision: "1"
 spec:
   replicas: 1
   selector:
@@ -30,7 +28,10 @@ spec:
         - name: pdns
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          #command: ["sleep", "infinity"]  
+          args:
+          {{- range .Values.pdns.args }}
+            - {{ . | quote }}
+          {{- end }}
           ports:
             {{- if .Values.service.webserver.enabled }}
             - containerPort: {{ .Values.service.webserver.port }}
@@ -44,6 +45,11 @@ spec:
               protocol: {{ .Values.service.dnsudp.protocol }}
             {{- end }}
           env:
+          - name: PDNS_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: pdns-secret
+                key: api-key
             {{- range .Values.pdns.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}

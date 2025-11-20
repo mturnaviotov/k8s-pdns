@@ -14,5 +14,5 @@ To get the Nexus URL:
   echo "Visit http://127.0.0.1:{{ .Values.service.webserver.port }}"
 {{- end }}
 
-Initial admin password: {{ .Values.pdns.apiPassword }}
+Initial admin password: {{ .Values.apiPassword }}
 

@@ -15,14 +15,14 @@ data:
   init.sh: |
     #!/bin/sh
     # Wait for PowerDNS to be ready
-    until curl -s -H 'X-API-KEY: {{ .Values.pdns.apiPassword }}' \
+    until curl -s -H 'X-API-KEY: {{ .Values.apiPassword }}' \
       -H 'accept: application/json' -H 'Content-Type: application/json' \
       "http://{{ include "app.FQDN" . }}/api/v1/servers/localhost/zones"; do
       echo "Waiting for pdns to be ready..."
       sleep 1
     done
     {{- range .Values.pdns.zones }}
-    curl -v -X POST -H 'X-API-KEY: {{ $.Values.pdns.apiPassword }}' \
+    curl -v -X POST -H 'X-API-KEY: {{ $.Values.apiPassword }}' \
       -H 'accept: application/json' -H 'Content-Type: application/json' \
       -d '{"name": "{{ . }}.", "kind": "Native", "masters": [], "nameservers": ["ns1.{{ . }}.", "ns2.{{ . }}."]}' \
       "http://{{ include "app.FQDN" $ }}/api/v1/servers/localhost/zones"
