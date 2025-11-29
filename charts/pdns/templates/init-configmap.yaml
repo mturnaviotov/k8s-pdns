@@ -26,7 +26,7 @@ data:
       -H 'accept: application/json' -H 'Content-Type: application/json' \
       -d '{"name": "{{ . }}.", "kind": "Native", "masters": [], "nameservers": ["ns1.{{ . }}.", "ns2.{{ . }}."]}' \
       "http://{{ include "app.FQDN" $ }}/api/v1/servers/localhost/zones"
-    curl -v -X PATCH -H 'X-API-KEY: {{ $.Values.pdns.apiPassword }}' \
+    curl -v -X PATCH -H 'X-API-KEY: {{ $.Values.apiPassword }}' \
       -H 'accept: application/json' -H 'Content-Type: application/json' \
       -d '{"rrsets":[{"changetype":"REPLACE","name":"{{ . }}.","records":[{"content":"ns1.{{ . }}. hostmaster.{{ . }}. 0 300 300 300 300","disabled":false}],"ttl":300,"type":"SOA"}]}' \
       "http://{{ include "app.FQDN" $ }}/api/v1/servers/localhost/zones/{{ .}}"
