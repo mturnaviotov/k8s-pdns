@@ -9,9 +9,12 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
 spec:
-  type: {{ .Values.service.type }}
-  {{- if .Values.ingress.ClusterIP }}
-  clusterIP: {{ .Values.ingress.ClusterIP | quote }}
+  type: {{ .Values.ingress.type }}
+  {{- if index .Values.ingress "type" | eq "ClusterIP" }}
+  clusterIP: {{ .Values.ingress.IP | quote }}
+  {{- end }}
+  {{- if index .Values.ingress "type" | eq "LoadBalancer" }}
+  loadBalancerIP: {{ .Values.ingress.IP | quote }}
   {{- end }}
   ports:
     {{- if .Values.service.webserver.enabled }}

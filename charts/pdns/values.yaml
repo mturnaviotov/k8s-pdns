@@ -23,7 +23,9 @@ service:
 ingress:
   enabled: true
   host: pdns.zone.internal
-  ClusterIP: 192.168.194.130
+  type: LoadBalancer # or ClusterIP
+  # IP is required due to basic network setup
+  IP: 10.5.0.150
   port: 8081
   annotations:
     kubernetes.io/ingress.className: traefik
@@ -60,7 +62,7 @@ pdns:
   - "--api-key=$(PDNS_API_KEY)"
   - "--webserver=yes"
   - "--webserver-address=0.0.0.0"
-  - "--webserver-allow-from=192.168.0.0/16,127.0.0.1,::1"
+  - "--webserver-allow-from=192.168.0.0/16,10.0.0.0/8,127.0.0.1,::1"
   - "--webserver-password=$(PDNS_API_KEY)"
   - "--disable-syslog=yes"
   - "--webserver-loglevel=detailed"
